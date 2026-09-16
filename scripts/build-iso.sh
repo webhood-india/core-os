@@ -32,7 +32,7 @@ lb config \
   --iso-publisher "Core OS Project" \
   --iso-volume "COREOS_1_0" \
   --iso-preparer "Core OS Build System" \
-  --boot=live components username=user user-fullname="Core User" live-config.user-default-groups=audio,cdrom,dip,floppy,video,plugdev,netdev,powerdev,scanner,bluetooth
+  --bootappend-live "boot=live components username=user user-fullname=Core User live-config.user-default-groups=audio,cdrom,dip,floppy,video,plugdev,netdev,powerdev,scanner,bluetooth"
 
 lb build
 ISO="$(find . -maxdepth 1 -type f -name 'live-image-*.hybrid.iso' -print -quit)"
