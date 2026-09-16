@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Core Terminal
+Comment=Developer terminal
+Exec=xfce4-terminal
+Icon=utilities-terminal
+Terminal=false
+Type=Application
+Categories=System;TerminalEmulator;

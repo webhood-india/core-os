@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+thunar "$HOME" >/dev/null 2>&1 &

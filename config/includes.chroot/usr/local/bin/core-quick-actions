@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+set -u
+mode="${1:-quick}"
+case "$mode" in
+  wifi)
+    nmcli radio wifi >/dev/null 2>&1 && nmcli radio wifi "$( [[ "$(nmcli radio wifi)" == enabled ]] && echo off || echo on )" >/dev/null 2>&1
+    notify-send 'Core Wi-Fi' "Wi-Fi: $(nmcli radio wifi 2>/dev/null)"
+    ;;
+  bluetooth)
+    if bluetoothctl show >/dev/null 2>&1; then
+      state="$(bluetoothctl show | awk '/Powered:/ {print $2; exit}')"
+      [[ "$state" == "yes" ]] && bluetoothctl power off >/dev/null || bluetoothctl power on >/dev/null
+      notify-send 'Core Bluetooth' "Bluetooth: $(bluetoothctl show | awk '/Powered:/ {print $2; exit}')"
+    fi
+    ;;
+  usb)
+    lsblk -o NAME,TRAN,SIZE,MODEL,MOUNTPOINTS | grep -E 'usb|USB' | rofi -dmenu -p 'USB Devices' -theme-str 'window {width: 70%;}' || true
+    ;;
+  quick)
+    choice="$(printf '%s\n' 'Wi-Fi' 'Bluetooth' 'USB Devices' 'Lock' 'Settings' 'Update' 'Power' | rofi -dmenu -p 'Quick Settings' -theme-str 'window {width: 36%;} listview {lines: 7;}')" || true
+    case "$choice" in
+      Wi-Fi) "$0" wifi;; Bluetooth) "$0" bluetooth;; 'USB Devices') "$0" usb;; Lock) loginctl lock-session;; Settings) xfce4-settings-manager;; Update) core-update check;; Power) xfce4-session-logout;; esac
+    ;;
+esac

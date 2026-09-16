@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -u
+DIR="$HOME/.local/share/core-os"; FILE="$DIR/reminders.txt"
+mkdir -p "$DIR"; touch "$FILE"
+choice="$(printf '%s\n' 'Add reminder' 'View reminders' | rofi -dmenu -p 'Core Reminders' -theme-str 'window {width: 45%;} listview {lines: 4;}')" || true
+case "$choice" in
+  'Add reminder')
+    reminder="$(printf '' | rofi -dmenu -p 'Reminder' -theme-str 'window {width: 60%;}')" || true
+    [[ -n "$reminder" ]] && printf '%s\n' "$reminder" >> "$FILE";;
+  'View reminders')
+    cat "$FILE" | rofi -dmenu -p 'Reminders' -theme-str 'window {width: 60%;} listview {lines: 10;}' || true;;
+esac

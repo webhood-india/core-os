@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+if command -v cheese >/dev/null 2>&1; then
+  cheese >/dev/null 2>&1 &
+else
+  notify-send 'Core Camera' 'Camera app is not bundled in Core 1.0. Install a camera application from your preferred package source.'
+fi

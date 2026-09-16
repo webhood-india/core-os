@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -u
+DIR="$HOME/.local/share/core-os"; FILE="$DIR/tasks.txt"
+mkdir -p "$DIR"; touch "$FILE"
+case "${1:-show}" in
+  add)
+    task="$(printf '' | rofi -dmenu -p 'New task' -theme-str 'window {width: 60%;}')" || true
+    [[ -n "$task" ]] && printf '%s\n' "$task" >> "$FILE"
+    ;;
+  done)
+    item="$(cat "$FILE" | rofi -dmenu -p 'Complete task' -theme-str 'window {width: 60%;}')" || true
+    [[ -n "$item" ]] && grep -Fxv "$item" "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
+    ;;
+esac
+items="$(cat "$FILE")"
+choice="$(printf '%s\n' "$items" | rofi -dmenu -p 'Today' -theme-str 'window {width: 55%;} listview {lines: 10;}')" || true
+case "$choice" in
+  '') ;;
+  *) "$0" done;;
+esac

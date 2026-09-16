@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Core Session
+Comment=Core OS lightweight desktop initialization
+Exec=/usr/local/bin/core-session-init
+Terminal=false
+OnlyShowIn=XFCE;
+X-GNOME-Autostart-enabled=true

@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -u
+printf 'Core OS hardware check\n\n'
+printf 'Kernel: '; uname -r
+printf 'CPU: '; lscpu | awk -F: '/Model name/ {gsub(/^ +/,"",$2); print $2; exit}'
+printf 'Memory: '; free -h | awk '/Mem:/ {print $2}'
+printf 'Graphics:\n'; lspci | grep -Ei 'vga|3d|display' || true
+printf '\nNetwork:\n'; nmcli device status 2>/dev/null || true
+printf '\nBluetooth: '; bluetoothctl show 2>/dev/null | awk '/Powered:/ {print $2; exit}' || echo unavailable
+printf '\nStorage:\n'; lsblk -o NAME,SIZE,TYPE,MOUNTPOINTS

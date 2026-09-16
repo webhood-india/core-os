@@ -1,0 +1,16 @@
+#!/bin/sh
+set -eu
+
+# Install Core Plymouth theme without adding a persistent boot delay.
+if command -v plymouth-set-default-theme >/dev/null 2>&1; then
+  plymouth-set-default-theme -R core || true
+fi
+
+# Core identity files.
+printf '%s\n' 'Core OS 1.0' > /etc/motd
+printf '%s\n' 'Core OS 1.0' > /etc/core-os-version
+printf '%s\n' 'Core OS — lightweight founder/developer workstation' > /etc/core-os-release
+
+# Disable a few noisy services from becoming startup dependencies.
+systemctl disable NetworkManager-wait-online.service 2>/dev/null || true
+exit 0

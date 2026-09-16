@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -u
+printf 'Core OS diagnostics\n\n'
+core-hardware-test
+printf '\nBoot:\n'
+core-boot-report

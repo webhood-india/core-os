@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -u
+choice="$(printf '%s\n' \
+  'Core Search' \
+  'Core Files' \
+  'Core Tasks' \
+  'Core Reminders' \
+  'Core Settings' \
+  'Terminal' \
+  'Browser' \
+  'Camera' \
+  'Meeting' \
+  'Quick Settings' \
+  'Core Update' \
+  'Install Core OS' | rofi -dmenu -p 'Core' -theme-str 'window {width: 42%;} listview {lines: 10;}')" || true
+case "$choice" in
+  'Core Search') core-search &;;
+  'Core Files') core-files &;;
+  'Core Tasks') core-tasks &;;
+  'Core Reminders') core-reminders &;;
+  'Core Settings') core-settings &;;
+  'Terminal') xfce4-terminal &;;
+  'Browser') xdg-open https://www.google.com &;;
+  'Camera') core-camera &;;
+  'Meeting') core-meeting &;;
+  'Quick Settings') core-quick-actions quick &;;
+  'Core Update') core-update check &;;
+  'Install Core OS') core-installer &;;
+esac

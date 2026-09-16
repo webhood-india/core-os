@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Core Browser
+Comment=Default web browser
+Exec=sh -c 'xdg-open https://www.google.com'
+Icon=web-browser
+Terminal=false
+Type=Application
+Categories=Network;WebBrowser;

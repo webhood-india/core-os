@@ -1,0 +1,8 @@
+build/
+cache/
+chroot/
+binary/
+*.iso
+*.iso.sha256
+*.tar.gz
+*.tar.zst

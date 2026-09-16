@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+set -u
+
+# Core OS session initialization. Keep this fast and idempotent.
+export PATH="/usr/local/bin:$PATH"
+
+# GTK/desktop theme
+xfconf-query -c xsettings -p /Net/ThemeName -s Adwaita-dark 2>/dev/null || true
+xfconf-query -c xsettings -p /Net/IconThemeName -s Papirus-Dark 2>/dev/null || true
+xfconf-query -c xsettings -p /Gtk/FontName -s "Inter 10" 2>/dev/null || true
+xfconf-query -c xfwm4 -p /general/theme -s Default 2>/dev/null || true
+xfconf-query -c xfwm4 -p /general/title_font -s "Inter SemiBold 10" 2>/dev/null || true
+
+# Keep the native Xfce panel as the lightweight status/task strip; style it via GTK CSS.
+xfconf-query -c xfce4-panel -p /panels/panel-1/size -s 34 2>/dev/null || true
+xfconf-query -c xfce4-panel -p /panels/panel-1/length -s 100 2>/dev/null || true
+
+# Clean desktop: no scattered icons.
+for p in /desktop-icons/show-home /desktop-icons/show-filesystem /desktop-icons/show-trash /desktop-icons/show-removable; do
+  xfconf-query -c xfce4-desktop -p "$p" -s false 2>/dev/null || true
+done
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-path -s /usr/share/backgrounds/core-os/core-dark.svg 2>/dev/null || true
+xfconf-query -c xfce4-desktop -p /backdrop/screen0/monitor0/image-style -s 5 2>/dev/null || true
+xfdesktop --reload 2>/dev/null || true
+
+# Start one lightweight dock. Avoid duplicate instances.
+if command -v plank >/dev/null 2>&1 && ! pgrep -x plank >/dev/null 2>&1; then
+  (plank >/dev/null 2>&1 &)
+fi
+
+# Lock/saver daemon. Password/PIN fallback remains the authoritative unlock path.
+if command -v xfce4-screensaver >/dev/null 2>&1 && ! pgrep -x xfce4-screensaver >/dev/null 2>&1; then
+  (xfce4-screensaver >/dev/null 2>&1 &)
+fi
+
+# Ensure notification daemon is available.
+if command -v xfce4-notifyd >/dev/null 2>&1 && ! pgrep -x xfce4-notifyd >/dev/null 2>&1; then
+  (xfce4-notifyd >/dev/null 2>&1 &)
+fi
+
+# Global shortcuts. They are user-editable later through Core Settings.
+xfconf-query -c xfce4-keyboard-shortcuts -p /commands/custom -n -t string -s '' 2>/dev/null || true
+set_key() {
+  local key="$1" command="$2"
+  xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/$key" -n -t string -s "$command" 2>/dev/null || \
+    xfconf-query -c xfce4-keyboard-shortcuts -p "/commands/custom/$key" -s "$command" 2>/dev/null || true
+}
+set_key '<Shift>s' 'core-search'
+set_key '<Shift>w' 'core-quick-actions wifi'
+set_key '<Shift>b' 'core-quick-actions bluetooth'
+set_key '<Shift>u' 'core-quick-actions usb'
+set_key '<Shift>q' 'core-quick-actions quick'
+set_key '<Shift>f' 'core-files'
+set_key '<Shift>c' 'core-camera'
+set_key '<Shift>m' 'core-meeting'
+set_key '<Shift>n' 'core-tasks add'
+set_key '<Shift>r' 'core-reminders'
+set_key '<Super>space' 'core-launcher'
+set_key '<Control><Alt>t' 'xfce4-terminal'
+set_key '<Super>l' 'xflock4'
+
+# Remove one-time startup marker after a successful session.
+touch "$HOME/.config/core-os/session-ready" 2>/dev/null || true

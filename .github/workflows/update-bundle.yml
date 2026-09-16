@@ -1,0 +1,36 @@
+name: Core OS Update Bundle
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build update bundle
+        run: |
+          chmod +x scripts/build-update-bundle.sh
+          ./scripts/build-update-bundle.sh
+
+      - name: Publish rolling update release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: core-update-latest
+          name: Core OS Rolling Update
+          prerelease: true
+          make_latest: false
+          overwrite_files: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          files: |
+            build/core-update.tar.gz
+            build/core-update.tar.gz.sha256
+            build/manifest.txt
+          fail_on_unmatched_files: true

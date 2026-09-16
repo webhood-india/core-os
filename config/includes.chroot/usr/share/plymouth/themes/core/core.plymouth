@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Core OS
+Description=Core OS minimal boot splash
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/core
+ScriptFile=/usr/share/plymouth/themes/core/core.script

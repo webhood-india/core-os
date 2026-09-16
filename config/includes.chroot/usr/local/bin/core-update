@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO="${CORE_UPDATE_REPO:-webhood-india/core-os}"
+TAG="${CORE_UPDATE_TAG:-core-update-latest}"
+BASE="https://github.com/${REPO}/releases/download/${TAG}"
+TMP="$(mktemp -d)"
+trap 'rm -rf "$TMP"' EXIT
+
+notify() { command -v notify-send >/dev/null && notify-send "Core Update" "$1" || true; }
+
+check() {
+  if ! curl -fsSLI "$BASE/core-update.tar.gz" >/dev/null 2>&1; then
+    notify "No Core update is currently published."
+    echo "No update bundle found at $BASE"
+    return 0
+  fi
+  curl -fsSL "$BASE/manifest.txt" -o "$TMP/manifest.txt"
+  local remote current
+  remote="$(awk -F= '/^VERSION=/{print $2}' "$TMP/manifest.txt" | head -1)"
+  current="$(cat /etc/core-os-version 2>/dev/null || echo unknown)"
+  if [[ "$remote" == "$current" ]]; then
+    notify "Core OS is up to date (${current})."
+    echo "Up to date: $current"
+  else
+    notify "Core update available: ${remote}"
+    echo "Update available: $remote (current: $current)"
+    if command -v rofi >/dev/null 2>&1 && [[ -n "${DISPLAY:-}" ]]; then
+      choice="$(printf 'Install Core %s\nNot now\n' "$remote" | rofi -dmenu -p 'Core Update' -theme-str 'window {width: 46%;} listview {lines: 2;}')" || true
+      if [[ "$choice" == Install* ]]; then
+        pkexec core-update apply
+      fi
+    fi
+  fi
+}
+
+apply() {
+  [[ $EUID -eq 0 ]] || { echo "Run with sudo: sudo core-update apply"; exit 1; }
+  curl -fsSL "$BASE/core-update.tar.gz" -o "$TMP/core-update.tar.gz"
+  curl -fsSL "$BASE/core-update.tar.gz.sha256" -o "$TMP/core-update.tar.gz.sha256"
+  (cd "$TMP" && sha256sum -c core-update.tar.gz.sha256)
+  rm -rf "$TMP/stage"; mkdir -p "$TMP/stage"
+  tar -xzf "$TMP/core-update.tar.gz" -C "$TMP/stage"
+  mkdir -p /var/backups/core-os
+  stamp="$(date +%Y%m%d-%H%M%S)"
+  backup="$TMP/backup"; mkdir -p "$backup"
+  mkdir -p "$backup/usr/local/bin" "$backup/usr/share/core-os" "$backup/etc/xdg/gtk-3.0"
+  cp -a /usr/local/bin/core-* "$backup/usr/local/bin/" 2>/dev/null || true
+  cp -a /usr/share/core-os/. "$backup/usr/share/core-os/" 2>/dev/null || true
+  cp -a /etc/xdg/gtk-3.0/gtk.css "$backup/etc/xdg/gtk-3.0/" 2>/dev/null || true
+  cp -a /etc/core-os-version "$backup/etc/" 2>/dev/null || true
+  tar -czf "/var/backups/core-os/core-update-${stamp}.tar.gz" -C "$backup" .
+
+  if ! rsync -a "$TMP/stage/payload/usr/local/bin/" /usr/local/bin/ \
+      || ! rsync -a "$TMP/stage/payload/usr/share/core-os/" /usr/share/core-os/ \
+      || ! rsync -a "$TMP/stage/payload/etc/xdg/gtk-3.0/" /etc/xdg/gtk-3.0/; then
+    echo "Update failed; restoring backup."
+    rsync -a "$backup/usr/local/bin/" /usr/local/bin/ 2>/dev/null || true
+    rsync -a "$backup/usr/share/core-os/" /usr/share/core-os/ 2>/dev/null || true
+    rsync -a "$backup/etc/xdg/gtk-3.0/" /etc/xdg/gtk-3.0/ 2>/dev/null || true
+    exit 1
+  fi
+  install -m 0644 "$TMP/stage/payload/etc/core-os-version" /etc/core-os-version
+  notify "Core OS update applied. Reboot to complete system changes."
+  echo "Core update applied. Reboot when convenient."
+}
+
+case "${1:-check}" in
+  check) check;;
+  apply) apply;;
+  *) echo "Usage: core-update [check|apply]"; exit 2;;
+esac

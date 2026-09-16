@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -u
+printf 'Core OS lightweight benchmark\n\n'
+printf 'Uptime: '; uptime -p
+printf 'Load: '; awk '{print $1,$2,$3}' /proc/loadavg
+printf 'Memory: '; free -h | awk '/Mem:/ {print $3 " used / " $2}'
+printf 'Root disk: '; df -h / | awk 'NR==2 {print $3 " used / " $2 " (" $5 ")"}'

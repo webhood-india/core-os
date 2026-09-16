@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -u
+choice="$(printf '%s\n' 'Appearance' 'Keyboard Shortcuts' 'Default Meeting URL' 'Users' 'Power' | rofi -dmenu -p 'Core Settings' -theme-str 'window {width: 45%;} listview {lines: 6;}')" || true
+case "$choice" in
+  Appearance) xfce4-appearance-settings &;;
+  'Keyboard Shortcuts') xfce4-keyboard-settings &;;
+  'Default Meeting URL')
+    current="https://meet.google.com"
+    [[ -f "$HOME/.config/core-os/defaults.conf" ]] && . "$HOME/.config/core-os/defaults.conf" 2>/dev/null || true
+    url="$(printf '%s' "$CORE_MEETING_URL" | rofi -dmenu -p 'Meeting URL')" || true
+    [[ -n "$url" ]] && printf 'CORE_MEETING_URL="%s"\nCORE_SEARCH_PROVIDER="%s"\n' "$url" "${CORE_SEARCH_PROVIDER:-https://www.google.com/search?q=}" > "$HOME/.config/core-os/defaults.conf";;
+  Users) xfce4-settings-manager &;;
+  Power) xfce4-session-logout &;;
+esac

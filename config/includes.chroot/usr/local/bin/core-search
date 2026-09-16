@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -u
+
+query="${*:-}"
+if [[ -z "$query" ]]; then
+  query="$(printf '' | rofi -dmenu -p 'Core Search' -theme-str 'window {width: 70%;} listview {lines: 8;} entry {placeholder-text: "Search files, apps, settings or the web…";}')" || true
+fi
+[[ -n "$query" ]] || exit 0
+
+# Exact application / command shortcuts first.
+if command -v "$query" >/dev/null 2>&1; then
+  "$query" >/dev/null 2>&1 &
+  exit 0
+fi
+
+# Local file search. Limit scope to keep search instant on an 8 GB machine.
+results="$(find "$HOME" -type f -iname "*${query}*" 2>/dev/null | head -80)"
+if [[ -z "$results" ]]; then
+  choice="$(printf 'Search the web for: %s\nOpen browser\nCore Settings\n' "$query" | rofi -dmenu -p 'Core Search' -theme-str 'window {width: 70%;} listview {lines: 5;}')" || true
+  case "$choice" in
+    Search\ the\ web*) xdg-open "https://www.google.com/search?q=$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))' "$query")" >/dev/null 2>&1 & ;;
+    Open\ browser) xdg-open https://www.google.com >/dev/null 2>&1 & ;;
+    Core\ Settings) xfce4-settings-manager >/dev/null 2>&1 & ;;
+  esac
+  exit 0
+fi
+
+choice="$(printf '%s\n' "$results" | rofi -dmenu -p "Results for $query" -theme-str 'window {width: 75%;} listview {lines: 12;}')" || true
+[[ -n "$choice" ]] && xdg-open "$choice" >/dev/null 2>&1 &

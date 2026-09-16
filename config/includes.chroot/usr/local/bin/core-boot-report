@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -u
+printf 'Core OS boot report\n\n'
+systemd-analyze 2>/dev/null || true
+printf '\nCritical chain:\n'
+systemd-analyze critical-chain 2>/dev/null || true

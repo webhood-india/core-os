@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Core Launcher
+Comment=Launch Core OS tools
+Exec=core-launcher
+Icon=applications-system
+Terminal=false
+Type=Application
+Categories=Utility;

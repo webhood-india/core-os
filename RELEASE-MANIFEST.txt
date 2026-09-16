@@ -1,0 +1,6 @@
+Core OS 1.0.0-core
+Base: Debian GNU/Linux 13 (Trixie)
+Architecture: amd64
+Desktop: XFCE foundation + Core visual layer
+Installer: Calamares framework
+Update: GitHub Actions + Core Update client

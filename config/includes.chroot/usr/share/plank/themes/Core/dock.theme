@@ -1,0 +1,14 @@
+[PlankTheme]
+TopRoundness=14
+BottomRoundness=14
+LineWidth=0
+OuterStrokeColor=0;0;0;0
+FillStartColor=12;15;20;235
+FillEndColor=20;24;31;235
+InnerStrokeColor=255;255;255;12
+HighlightColor=255;255;255;7
+IndicatorColor=124;116;255;255
+UrgentBounce=true
+ItemPadding=7
+IndicatorSize=3
+CornerRadius=14

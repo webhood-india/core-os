@@ -1,0 +1,42 @@
+/* Core OS 1.0 — minimal graphite UI */
+* {
+  -GtkWidget-focus-line-width: 1;
+  -GtkWidget-focus-padding: 2;
+}
+window, dialog {
+  background: #0b0d10;
+  color: #f5f7fa;
+}
+button {
+  background: #171b21;
+  border: 1px solid #272d36;
+  border-radius: 8px;
+  color: #f5f7fa;
+  padding: 7px 12px;
+}
+button:hover { background: #202630; border-color: #6c63ff; }
+button:checked, button:active { background: #6c63ff; color: #ffffff; }
+entry, textview, spinbutton {
+  background: #10141a;
+  color: #f5f7fa;
+  border: 1px solid #2a3039;
+  border-radius: 8px;
+}
+selection { background: #6c63ff; color: #ffffff; }
+menu, popover { background: #14181e; border: 1px solid #2a3039; }
+menuitem:hover { background: #252b35; }
+
+/* Core panel / dock language */
+#XfcePanelWindow {
+  background-color: rgba(11, 13, 16, 0.94);
+  border: 0;
+  color: #F5F7FA;
+}
+#XfcePanelWindow button,
+#XfcePanelWindow entry {
+  background: transparent;
+  border: 0;
+  color: #F5F7FA;
+}
+#XfcePanelWindow button:hover { background: rgba(108,99,255,.16); }
+#XfcePanelWindow menuitem:hover { background: #252B35; }

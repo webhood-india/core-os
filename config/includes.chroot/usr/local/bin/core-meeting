@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+CONFIG="$HOME/.config/core-os/defaults.conf"
+CORE_MEETING_URL="https://meet.google.com"
+[[ -f "$CONFIG" ]] && . "$CONFIG" 2>/dev/null || true
+xdg-open "${CORE_MEETING_URL:-https://meet.google.com}" >/dev/null 2>&1 &

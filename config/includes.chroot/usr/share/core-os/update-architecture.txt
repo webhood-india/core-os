@@ -1,0 +1,6 @@
+Core Update Architecture
+
+The installed client downloads a signed-by-hash GitHub Release bundle,
+verifies SHA256, stages it, creates a rollback backup, then applies files.
+The ISO remains the recovery/install medium. Routine updates do not require
+rebuilding or replacing the ISO.

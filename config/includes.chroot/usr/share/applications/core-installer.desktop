@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Install Core OS
+Comment=Install Core OS to a disk
+Exec=core-installer
+Icon=drive-harddisk
+Terminal=false
+Type=Application
+Categories=System;
